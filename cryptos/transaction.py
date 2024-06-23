@@ -5,10 +5,9 @@ Reference: https://en.bitcoin.it/wiki/Transaction
 
 from __future__ import annotations # PEP 563: Postponed Evaluation of Annotations
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Union
+from typing import List, Union
 
 import os
-import requests
 import string
 from io import BytesIO
 
@@ -16,6 +15,7 @@ from .sha256 import sha256
 from .ripemd160 import ripemd160
 from .ecdsa import verify, Signature
 from .keys import PublicKey
+from security import safe_requests
 
 # -----------------------------------------------------------------------------
 # helper functions
@@ -78,7 +78,7 @@ class TxFetcher:
                 url = 'https://blockstream.info/testnet/api/tx/%s/hex' % (tx_id, )
             else:
                 raise ValueError("%s is not a valid net type, should be main|test" % (net, ))
-            response = requests.get(url)
+            response = safe_requests.get(url)
             assert response.status_code == 200, "transaction id %s was not found on blockstream" % (tx_id, )
             raw = bytes.fromhex(response.text.strip())
             # cache on disk
